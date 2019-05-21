@@ -21,7 +21,10 @@ export default class ArticleList extends Component {
     this.state = {
       dataSource: [],
       columns: [],
-      total: 0
+      total: 0,
+      isLoading: false,
+      offset: 0,
+      limited: 10
     }
   }
   createColumns = (columnsKeys) =>{
@@ -65,7 +68,10 @@ export default class ArticleList extends Component {
     return columns
   }
   getData = () => {
-    getArticles()
+    this.setState({
+      isLoading: true
+    })
+    getArticles(this.state.offset,this.state.limited)
       .then(resp => {
         const columnsKeys = Object.keys(resp.list[0])
         const columns = this.createColumns(columnsKeys)
@@ -75,6 +81,30 @@ export default class ArticleList extends Component {
           columns
         })
       })
+      .catch(err => {
+
+      })
+      .finally(() => {
+        this.setState({
+          isLoading: false
+        })
+      })
+  }
+  onPageChange = (page, pageSize) => {
+    this.setState({
+      offset: pageSize * (page-1),
+      limited: pageSize
+    }, () => {
+      this.getData()
+    })
+  }
+  onShowSizeChange = (curent, size) =>{
+    this.setState({
+      offset: 0,
+      limited: size
+    }, () => {
+      this.getData()
+    })
   }
   componentDidMount () {
     this.getData()
@@ -91,8 +121,16 @@ export default class ArticleList extends Component {
             rowKey={record => record.id}
             dataSource={this.state.dataSource} 
             columns={this.state.columns} 
+            loading={this.state.isLoading}
             pagination={{
-              hideOnSinglePage: true
+              current: this.state.offset / this.state.limited +1,
+              hideOnSinglePage: true,
+              total: this.state.total,
+              showQuickJumper: true,
+              showSizeChanger: true,
+              onChange: this.onPageChange,
+              onShowSizeChange: this.onShowSizeChange,
+              pageSizeOptions: ['10', '20', '30', '40']
             }}
           />
         </Card>
