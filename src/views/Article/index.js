@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 
-import { Card, Button, Table, Tag } from 'antd'
+import { Card, Button, Table, Tag, Tooltip, Modal, Typography, message } from 'antd'
 
-import { getArticles } from '../../requests'
+import { getArticles, deleteArticle } from '../../requests'
+import XLSX from 'xlsx'
 import moment from 'moment'
 
 const ButtonGroup = Button.Group
+const confirm = Modal.confirm
 
 const titleColumnsMap = {
   id: 'id',
@@ -27,14 +29,47 @@ export default class ArticleList extends Component {
       limited: 10
     }
   }
+
+  articleDelete = (record) => {
+    confirm({
+      title: '此文章删除后将不能复原，请谨慎',
+      content: <Typography>确定要删除<span style={{color: '#f00'}}>{record.title}</span>吗</Typography>,
+      onOk() {
+        return new Promise((resolve, reject) => {
+          deleteArticle(record.id)
+            .then(resp => {
+              message.success(resp.msg)
+              // this.setState({
+              //   offset: 0
+              // },() => {
+              //   this.getData()
+              // })
+            })
+            .finally(() => {
+              resolve()
+            })
+        })
+      },
+      onCancel() {}
+    })
+  }
+
+  toEdit = (record) => {
+    this.props.history.push(`/admin/article/edit/${record.id}`)
+  }
+
   createColumns = (columnsKeys) =>{
     const columns = columnsKeys.map(item => {
       if (item === 'amount') {
         return {
           title: titleColumnsMap[item],
           key: item,
-          render: (record) => {
-            return <Tag color={record.amount > 230 ? "red" : "cyan"}>{record.amount}</Tag>
+          render: (text,record) => {
+            return (
+              <Tooltip title={record.amount > 230 ? "超过230" : "小于230"}>
+                <Tag color={record.amount > 230 ? "red" : "cyan"}>{record.amount}</Tag>
+              </Tooltip>
+            )
           }
         }
       }
@@ -42,7 +77,7 @@ export default class ArticleList extends Component {
         return {
           title: titleColumnsMap[item],
           key: item,
-          render: (record) => {
+          render: (text,record) => {
             return moment(record.createAt).format('YYYY年MM月DD日 HH:mm:ss')
           }
         }
@@ -56,17 +91,36 @@ export default class ArticleList extends Component {
     columns.push({
       title: '操作',
       key: 'action',
-      render: () => {
+      render: (text,record) => {
         return (
           <ButtonGroup>
-            <Button size="small" type="primary">编辑</Button>
-            <Button size="small" type="danger">删除</Button>
+            <Button size="small" type="primary" onClick={this.toEdit.bind(this,record)}>编辑</Button>
+            <Button size="small" type="danger" onClick={this.articleDelete.bind(this,record)}>删除</Button>
           </ButtonGroup>
         )
       }
     })
     return columns
-  }
+  } 
+
+  toExcel = () =>{
+    const data = [Object.keys(this.state.dataSource[0])]
+    this.state.dataSource.forEach(item => {
+      data.push([
+        item.id,
+        item.title,
+        item.author,
+        item.amount,
+        moment(item.createAt).format('YYYY年MM月DD日 HH:mm:ss')
+      ])
+    })
+    const ws = XLSX.utils.aoa_to_sheet(data)
+		const wb = XLSX.utils.book_new()
+		XLSX.utils.book_append_sheet(wb, ws, "SheetJS")
+		/* generate XLSX file and send to client */
+		XLSX.writeFile(wb, `articles-${moment().format('YYYY年MM月DD日 HH:mm:ss')}.xlsx`)
+  } 
+
   getData = () => {
     this.setState({
       isLoading: true
@@ -90,6 +144,7 @@ export default class ArticleList extends Component {
         })
       })
   }
+
   onPageChange = (page, pageSize) => {
     this.setState({
       offset: pageSize * (page-1),
@@ -98,7 +153,8 @@ export default class ArticleList extends Component {
       this.getData()
     })
   }
-  onShowSizeChange = (curent, size) =>{
+
+  onShowSizeChange = (current, size) =>{
     this.setState({
       offset: 0,
       limited: size
@@ -106,16 +162,18 @@ export default class ArticleList extends Component {
       this.getData()
     })
   }
+
   componentDidMount () {
     this.getData()
   }
+
   render() {
     return (
       <div>
         <Card 
-          title="Card title" 
+          title="文章管理" 
           bordered={false} 
-          extra={<Button>导出Excel</Button>} 
+          extra={<Button onClick={this.toExcel}>导出Excel</Button>} 
         >
           <Table 
             rowKey={record => record.id}

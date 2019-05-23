@@ -20,10 +20,15 @@ ajax.interceptors.response.use(resp =>{
         message.error(resp.data.errMsg)
     }
 })
-
+// 获取文章列表
 export const getArticles = (offset = 0, limited = 10) => {
     return ajax.post('/api/v1/articleList', {
         offset, 
         limited
     })
+}
+
+// 通过id删除某篇文章
+export const deleteArticle = (id) => {
+    return ajax.post(`/api/v1/articleDelete/${id}`)
 }
