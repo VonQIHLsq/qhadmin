@@ -32,3 +32,18 @@ export const getArticles = (offset = 0, limited = 10) => {
 export const deleteArticle = (id) => {
     return ajax.post(`/api/v1/articleDelete/${id}`)
 }
+
+// 通过id编辑某篇文章
+export const editArticle = (id) => {
+    return ajax.post(`/api/v1/getOneArticle/${id}`)
+}
+
+// 保存当前id文章
+export const saveArticle = (id,data) => {
+    return ajax.post(`/api/v1/saveArticle/${id}`,data)
+}
+
+// 获取最近几月的数量
+export const amountArticle = () => {
+    return ajax.post('/api/v1/getChart')
+}

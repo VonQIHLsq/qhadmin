@@ -31,6 +31,7 @@ export default class ArticleList extends Component {
   }
 
   articleDelete = (record) => {
+    const getData = this.getData
     confirm({
       title: '此文章删除后将不能复原，请谨慎',
       content: <Typography>确定要删除<span style={{color: '#f00'}}>{record.title}</span>吗</Typography>,
@@ -39,11 +40,7 @@ export default class ArticleList extends Component {
           deleteArticle(record.id)
             .then(resp => {
               message.success(resp.msg)
-              // this.setState({
-              //   offset: 0
-              // },() => {
-              //   this.getData()
-              // })
+              getData()
             })
             .finally(() => {
               resolve()
