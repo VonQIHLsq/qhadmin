@@ -47,3 +47,8 @@ export const saveArticle = (id,data) => {
 export const amountArticle = () => {
     return ajax.post('/api/v1/getChart')
 }
+
+// 获取通知列表信息
+export const amountNotifications = () => {
+    return ajax.post('api/v1/getNotifications')
+}

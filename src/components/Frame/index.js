@@ -6,12 +6,21 @@ import { adminRoutes } from '../../routes'
 import { withRouter } from 'react-router-dom'
 import './frame.less'
 import logo from './logo.png'
+import { connect } from 'react-redux'
 
 const { Header, Content, Sider } = Layout
 
 const menus = adminRoutes.filter(item => item.isNav === true)
 
+const mapState = state => {
+  return {
+    notificationsReads: state.notifications.list.filter(item => item.hasRead === false).length
+  }
+}
+
+
 @withRouter
+@connect(mapState)
 class Frame extends Component {
   onMenuClick = ({key}) =>{
     this.props.history.push(key)
@@ -22,7 +31,7 @@ class Frame extends Component {
       <Menu.Item
         key="/admin/notifications"
       >
-        <Badge dot>
+        <Badge dot={Boolean(this.props.notificationsReads)}>
           通知中心
         </Badge>
       </Menu.Item>
@@ -51,7 +60,7 @@ class Frame extends Component {
           <Dropdown overlay={this.renderMenu}>
             <div className="qh-avatar">
               <Avatar style={{ backgroundColor: '#87d068' }} icon="user" />
-              <Badge count={15} offset={[5,-8]}><span className="qh-span">欢迎您！qh</span></Badge>
+              <Badge count={this.props.notificationsReads} offset={[5,-8]}><span className="qh-span">欢迎您！qh</span></Badge>
               <Icon type="down" />
             </div>
           </Dropdown>
