@@ -44,17 +44,15 @@ export const markNotificationAsReadAll = () => {
 export const getNotifications = () => {
     return dispatch => {
         dispatch(startPost())
-        setTimeout(() => {
-            amountNotifications()
-                .then(resp => {
-                    dispatch({
-                        type: actionTypes.RECEIVED_NOTIFICATIONS,
-                        payload: {
-                            list: resp.list
-                        }
-                    })
+        amountNotifications()
+            .then(resp => {
+                dispatch({
+                    type: actionTypes.RECEIVED_NOTIFICATIONS,
+                    payload: {
+                        list: resp.list
+                    }
                 })
-            dispatch(finishPost())
-        },2000)
+            })
+        dispatch(finishPost())
     }
 }

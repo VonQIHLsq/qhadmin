@@ -41,6 +41,7 @@ class Edit extends Component {
         const data = Object.assign({}, values, {
           createAt: values.createAt.valueOf()
         })
+        if (!this.updater.isMounted(this)) return
         this.setState({
           isLoading: true
         })
@@ -50,6 +51,7 @@ class Edit extends Component {
             this.props.history.push('/admin/article')
           })
           .finally(() => {
+            if (!this.updater.isMounted(this)) return
             this.setState({
               isLoading: false
             })

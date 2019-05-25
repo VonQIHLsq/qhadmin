@@ -5,9 +5,19 @@ import { adminRoutes } from './routes'
 
 import Frame from './components/Frame'
 
-export default class App extends Component {
+import { connect } from 'react-redux'
+
+const mapState = state => ({
+  isLogin: state.user.isLogin,
+  role: state.user.role
+})
+
+@connect(mapState)
+class App extends Component {
   render() {
     return (
+      this.props.isLogin
+      ?
       <Frame>
         <Switch>
           {
@@ -18,7 +28,8 @@ export default class App extends Component {
                   path={route.pathname} 
                   exact={route.exact}
                   render={(routerProps) => {
-                    return <route.component {...routerProps}/>
+                    const hasPromission = route.roles.includes(this.props.role)
+                    return hasPromission ? <route.component {...routerProps}/> : <Redirect to='/admin/noauth'/>
                 }}/>
               )
             })
@@ -27,6 +38,9 @@ export default class App extends Component {
           <Redirect to="/404"/>
         </Switch>
       </Frame>
+      :
+      <Redirect to='/login'/>
     )
   }
 }
+export default App

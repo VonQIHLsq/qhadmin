@@ -8,22 +8,36 @@ import './frame.less'
 import logo from './logo.png'
 import { connect } from 'react-redux'
 
+import { getNotifications } from '../../actions/notifications'
+import { loginOut } from '../../actions/user'
+
 const { Header, Content, Sider } = Layout
 
 const menus = adminRoutes.filter(item => item.isNav === true)
 
 const mapState = state => {
   return {
-    notificationsReads: state.notifications.list.filter(item => item.hasRead === false).length
+    notificationsReads: state.notifications.list.filter(item => item.hasRead === false).length,
+    avatar: state.user.avatar,
+    displayName: state.user.displayName
   }
 }
 
 
 @withRouter
-@connect(mapState)
+@connect(mapState, { getNotifications, loginOut })
 class Frame extends Component {
+
+  componentDidMount() {
+    this.props.getNotifications()
+  }
+
   onMenuClick = ({key}) =>{
-    this.props.history.push(key)
+    if ( key === '/loginOut') {
+      this.props.loginOut()
+    } else {
+      this.props.history.push(key)
+    }
   }
 
   renderMenu = () => (
@@ -41,7 +55,7 @@ class Frame extends Component {
         个人设置
       </Menu.Item>
       <Menu.Item
-        key="/login"
+        key="/loginOut"
       >
         退出登录
       </Menu.Item>
@@ -57,10 +71,10 @@ class Frame extends Component {
           <div className="logo qh-logo">
             <img src={logo} alt="QHADMIN"/>
           </div>
-          <Dropdown overlay={this.renderMenu}>
+          <Dropdown overlay={this.renderMenu()}>
             <div className="qh-avatar">
-              <Avatar style={{ backgroundColor: '#87d068' }} icon="user" />
-              <Badge count={this.props.notificationsReads} offset={[5,-8]}><span className="qh-span">欢迎您！qh</span></Badge>
+              <Avatar src={this.props.avatar} />
+              <Badge count={this.props.notificationsReads} offset={[5,-8]}><span className="qh-span">欢迎您！{this.props.displayName}</span></Badge>
               <Icon type="down" />
             </div>
           </Dropdown>

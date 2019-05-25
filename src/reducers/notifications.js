@@ -17,6 +17,11 @@ const initState = {
 
 export default (state = initState, action) => {
     switch(action.type){
+        case actionTypes.RECEIVED_NOTIFICATIONS:
+            return{
+                ...state,
+                list: action.payload.list
+            }
         case actionTypes.START_NOTIFICATION_POST:
             return {
                 ...state,
@@ -45,11 +50,6 @@ export default (state = initState, action) => {
                     item.hasRead = true
                     return item
                 })
-            }
-        case actionTypes.RECEIVED_NOTIFICATIONS:
-            return{
-                ...state,
-                list: action.payload.list
             }
         default:
             return state

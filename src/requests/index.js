@@ -52,3 +52,8 @@ export const amountArticle = () => {
 export const amountNotifications = () => {
     return ajax.post('api/v1/getNotifications')
 }
+
+// 获取通知列表信息
+export const loginRequests = (userInfo) => {
+    return ajax.post('api/v1/login',userInfo)
+}

@@ -119,6 +119,7 @@ export default class ArticleList extends Component {
   } 
 
   getData = () => {
+    if (!this.updater.isMounted(this)) return
     this.setState({
       isLoading: true
     })
@@ -126,6 +127,7 @@ export default class ArticleList extends Component {
       .then(resp => {
         const columnsKeys = Object.keys(resp.list[0])
         const columns = this.createColumns(columnsKeys)
+        if (!this.updater.isMounted(this)) return
         this.setState({
           total: resp.total,
           dataSource: resp.list,
@@ -136,6 +138,7 @@ export default class ArticleList extends Component {
 
       })
       .finally(() => {
+        if (!this.updater.isMounted(this)) return
         this.setState({
           isLoading: false
         })

@@ -5,7 +5,8 @@ import {
     Settings,
     ArticleList,
     ArticleEdit,
-    Notifications
+    Notifications,
+    NoAuth
 } from '../views'
 
 export const mainRoutes = [{
@@ -21,24 +22,33 @@ export const adminRoutes = [{
     component: Dashboard,
     title: '仪表盘',
     icon: 'pie-chart',
-    isNav: true
+    isNav: true,
+    roles: ['001','002','003']
 }, {
     pathname: '/admin/article',
     component: ArticleList,
     title: '文章管理',
     icon: 'unordered-list',
     exact: true,
-    isNav: true
+    isNav: true,
+    roles: ['001','002']
 }, {
     pathname: '/admin/article/edit/:id',
-    component: ArticleEdit
+    component: ArticleEdit,
+    roles: ['001']
+}, {
+    pathname: '/admin/noauth',
+    component: NoAuth,
+    roles: ['001','002','003']
 }, {
     pathname: '/admin/notifications',
-    component: Notifications
+    component: Notifications,
+    roles: ['001','002','003']
 }, {
     pathname: '/admin/settings',
     component: Settings,
     title: '设置',
     icon: 'setting',
-    isNav: true
+    isNav: true,
+    roles: ['001','002']
 }]
